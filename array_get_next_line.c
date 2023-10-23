@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
-#define BUFFER_SIZE 10
+#define BUFFER_SIZE 100
 
 size_t	ft_strlen(const char *str)
 {
@@ -78,32 +78,38 @@ char	*ft_print_jumpline(char *temp)
 	char	*dest;
 
 	i = 0;
-	while (temp && temp[i] && temp[i] != '\n')
+	while (temp[i] && temp[i] != '\n')
 		i++;
+	if (!temp[i])
+	{
+		free(temp);
+		return (NULL);
+	}
 	dest = malloc(sizeof(*dest) * ft_strlen(temp) - i + 1);
 	if (!dest)
 		return (NULL);
 	j = 0;
-	while (temp && temp[i])
+	while (temp[i])
 		dest[j++] = temp [++i];
 	dest[i] = '\0';
+	free(temp);
 	return (dest);
 
 }
-char	*ft_get_jumpline(char *buf, int ret)
+char	*ft_get_jumpline(char *buf)
 {
 	int		i;
 	char	*dest;
 
 	i = 0;
+	if (!buf[i])
+		return (NULL);
 	while (buf && buf[i] != '\n')
 		i++;
-	dest = malloc(sizeof(char) * (i + 1));
+	dest = (char *)malloc(sizeof(char) * (i + 2));
 	if (!dest)
 		return (NULL);
 	i = 0;
-	if (ft_strchr(buf, '\n') != '\0')
-		ret = 1;
 	while (buf && buf[i] && buf[i] != '\n')
 	{
 		dest[i] = buf[i];
@@ -113,40 +119,43 @@ char	*ft_get_jumpline(char *buf, int ret)
 	return (dest);
 }
 
+char	*ft_read_line(int fd, char *str)
+{
+	char	*buff;
+	int	readed;
+
+	buff = malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!buff)
+		return (NULL);
+	readed = 1;
+	while (!ft_strchr(str, '\n') && readed != 0)
+	{
+		readed = read(fd, buff, BUFFER_SIZE);
+		if (readed == -1)
+		{
+			free(buff);
+			return (NULL);
+		}
+		buff[readed] = '\0';
+		str = ft_strjoin(str, buff);
+	}
+	free(buff);
+	return (str);
+}
 
 char	*get_next_line(int fd)
 {
-	char		*buf;
-	int			ret;
-	static char	*str;
-	char		*temp;
-	char		*line;
+	char *line;
+	static char *str;
 
-	if (fd < 0 || fd > 1023 || buf <= 0)
-		ret = -1;
-	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	while (ret > 0)
-	{
-		ret = read(fd, buf, BUFFER_SIZE);
-		if (ret < 0)
-			ret = -1;
-		buf[ret] = '\0';
-		temp = str;
-		str = ft_strjoin(temp, buf);
-		free(temp);
-		if (ft_strchr(str, '\n'))
-			break;
-	}
-	if (ret >= 0)
-	{
-		line = ft_get_jumpline(str, ret);
-		temp = str;
-		str = ft_print_jumpline(temp);
-		free (temp);
-	}
-	free (buf);
-	return (buf);
-
+	if (fd < 0 || BUFFER_SIZE < 0)
+		return (0);
+	str = ft_read_line(fd, str);
+	if (!str)
+		return (0);
+	line = ft_get_jumpline(str);
+	str = ft_print_jumpline(str);
+	return (line);
 }
 
 #include <stdio.h>
@@ -154,12 +163,26 @@ int	main()
 {
 	int	fd;
 	char *line;
+	int i;
 
 	fd = open("lore.txt", O_RDONLY);
-
-	while ((line = get_next_line(fd)) != NULL)
+	if (fd < 0)
 	{
-		printf("%s\n", line);
+		perror("open");
+		return (1);
+	}
+
+	i = 1;
+	while (i < 7)
+	{
+		line = get_next_line(fd);
+		if (!line)
+		{
+			printf("Error obteniendo nueva linea...\n");
+			close(fd);
+			return(1);
+		}
+		printf("line [%02d] : %s", i, line);
 		free(line);
 	}
 	close(fd);
