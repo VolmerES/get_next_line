@@ -6,7 +6,7 @@
 /*   By: jdelorme <jdelorme@student.42madrid>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/20 17:38:07 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/10/24 19:37:53 by jdelorme         ###   ########.fr       */
+/*   Updated: 2023/10/25 17:29:29 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ char	*ft_print_jumpline(char *temp)
 	dest = malloc(sizeof(char) * (ft_strlen(temp) - i + 1));
 	if (!dest)
 	{
-		return (NULL);
+		return (free(temp), NULL);
 	}
 	j = 0;
 	while (temp[i])
@@ -54,8 +54,8 @@ char	*ft_get_jumpline(char *buf)
 		i++;
 	}
 	dest = (char *)malloc(sizeof(char) * (i + 1));
-	if (!buf)
-		return (NULL);
+	if (!dest)
+		return (NULL); //null_check here
 	i = 0;
 	while (buf && buf[i] && buf[i] != '\n')
 	{
@@ -63,8 +63,7 @@ char	*ft_get_jumpline(char *buf)
 		i++;
 	}
 	if (buf[i] == '\n')
-		dest[i] = '\n';
-	i++;
+		dest[i++] = '\n';
 	dest[i] = '\0';
 	return (dest);
 }
@@ -74,9 +73,15 @@ char	*ft_read_line(int fd, char *str)
 	char	*buff;
 	int		readed;
 
+	if (!str)
+		str = ft_calloc(1, 1);
+	if (!str)
+	{
+		return (NULL);
+	}
 	buff = malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (!buff)
-		return (NULL);
+		return (free(str), NULL);
 	readed = 1;
 	while (!ft_strchr(str, '\n') && readed != 0)
 	{
@@ -84,40 +89,49 @@ char	*ft_read_line(int fd, char *str)
 		if (readed == -1)
 		{
 			free(buff);
+			free(str);
 			return (NULL);
 		}
 		buff[readed] = '\0';
 		str = ft_strjoin(str, buff);
+		if (!str)
+			return (free(buff), NULL);
 	}
 	free(buff);
 	return (str);
 }
-
 char	*get_next_line(int fd)
 {
 	char *line;
 	static char *str;
 
-	if (str == NULL)
-		str = "";
-	//	str = ft_calloc(BUFFER_SIZE, sizeof(char *));
-	if (fd < 0 || BUFFER_SIZE < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (0);
+	// if (str == NULL)
+	// 	str = "";
+	//	str = ft_calloc(BUFFER_SIZE, sizeof(char *));
 	str = ft_read_line(fd, str);
 	if (!str)
 		return (0);
 	line = ft_get_jumpline(str);
+//	if (!line)
+//		return (NULL);
 	str = ft_print_jumpline(str);
 	return (line);
 }
-/*
+
+/* void	runleaks(void)
+{
+	system("leaks a.out");
+}
+
 int	main()
 {
 	int	fd;
 	char *line;
 	int i;
 
-	fd = open("1char.txt", O_RDONLY);
+	fd = open("only_nl.txt", O_RDONLY);
 	if (fd < 0)
 	{
 		perror("open");
@@ -127,7 +141,7 @@ int	main()
 	{
 		line = get_next_line(fd);
 		if (!line)
-		{
+	{
 			printf("\nError obteniendo nueva linea...\n");
 			close(fd);
 			return(1);
@@ -137,5 +151,6 @@ int	main()
 		free(line);
 	}	
 	close(fd);
+	// atexit(runleaks);
 	return (0);
-}*/
+} */
