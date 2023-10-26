@@ -6,7 +6,7 @@
 /*   By: jdelorme <jdelorme@student.42madrid>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/24 11:17:33 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/10/24 19:32:56 by jdelorme         ###   ########.fr       */
+/*   Updated: 2023/10/26 17:43:29 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,10 @@
 # include <unistd.h>
 # include <fcntl.h>
 # ifndef BUFFER_SIZE
-# define BUFFER_SIZE 1000000
+#  define BUFFER_SIZE 10
 # endif
+
+char	*ft_strdup(const char *str);
 char	*ft_print_jumpline(char *temp);
 char	*ft_get_jumpline(char *buf);
 char	*ft_read_line(int fd, char *str);

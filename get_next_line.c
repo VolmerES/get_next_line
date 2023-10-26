@@ -1,16 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   arry_get_next_line.c                               :+:      :+:    :+:   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jdelorme <jdelorme@student.42madrid>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/20 17:38:07 by jdelorme          #+#    #+#             */
-/*   Updated: 2023/10/25 17:29:29 by jdelorme         ###   ########.fr       */
+/*   Updated: 2023/10/26 18:14:19 by jdelorme         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
+char	*ft_strdup(const char *str)
+{
+	char	*cpy;
+	int		i;
+
+	i = 0;
+	cpy = malloc((ft_strlen((char *)str) + 1) * sizeof(char));
+	if (cpy == NULL)
+		return (NULL);
+	while (str[i] != '\0')
+	{	
+		cpy[i] = str[i];
+		i++;
+	}
+	cpy[i] = '\0';
+	return (cpy);
+}
 
 char	*ft_print_jumpline(char *temp)
 {
@@ -37,8 +55,8 @@ char	*ft_print_jumpline(char *temp)
 	dest[j] = '\0';
 	free(temp);
 	return (dest);
-
 }
+
 char	*ft_get_jumpline(char *buf)
 {
 	int		i;
@@ -50,12 +68,10 @@ char	*ft_get_jumpline(char *buf)
 	while (buf && buf[i] && buf[i] != '\n')
 		i++;
 	if (buf[i] == '\n')
-	{
 		i++;
-	}
 	dest = (char *)malloc(sizeof(char) * (i + 1));
 	if (!dest)
-		return (NULL); //null_check here
+		return (NULL);
 	i = 0;
 	while (buf && buf[i] && buf[i] != '\n')
 	{
@@ -76,9 +92,7 @@ char	*ft_read_line(int fd, char *str)
 	if (!str)
 		str = ft_calloc(1, 1);
 	if (!str)
-	{
 		return (NULL);
-	}
 	buff = malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (!buff)
 		return (free(str), NULL);
@@ -87,51 +101,44 @@ char	*ft_read_line(int fd, char *str)
 	{
 		readed = read(fd, buff, BUFFER_SIZE);
 		if (readed == -1)
-		{
-			free(buff);
-			free(str);
-			return (NULL);
-		}
+			return (free(buff), free(str), NULL);
 		buff[readed] = '\0';
 		str = ft_strjoin(str, buff);
 		if (!str)
 			return (free(buff), NULL);
 	}
-	free(buff);
-	return (str);
+	return (free(buff), str);
 }
+
 char	*get_next_line(int fd)
 {
-	char *line;
-	static char *str;
+	static char	*str;
+	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (0);
-	// if (str == NULL)
-	// 	str = "";
-	//	str = ft_calloc(BUFFER_SIZE, sizeof(char *));
 	str = ft_read_line(fd, str);
 	if (!str)
 		return (0);
 	line = ft_get_jumpline(str);
-//	if (!line)
-//		return (NULL);
+	if (!line)
+	{
+		free(str);
+		str = NULL;
+		return (NULL);
+	}
 	str = ft_print_jumpline(str);
 	return (line);
 }
 
-/* void	runleaks(void)
-{
-	system("leaks a.out");
-}
-
+/*
 int	main()
 {
 	int	fd;
 	char *line;
 	int i;
 
-	fd = open("only_nl.txt", O_RDONLY);
+	fd = open("./tests/lore.txt", O_RDONLY);
 	if (fd < 0)
 	{
 		perror("open");
@@ -141,7 +148,7 @@ int	main()
 	{
 		line = get_next_line(fd);
 		if (!line)
-	{
+		{
 			printf("\nError obteniendo nueva linea...\n");
 			close(fd);
 			return(1);
@@ -151,6 +158,5 @@ int	main()
 		free(line);
 	}	
 	close(fd);
-	// atexit(runleaks);
 	return (0);
-} */
+}*/
