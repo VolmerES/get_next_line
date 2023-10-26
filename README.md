@@ -62,7 +62,7 @@ The bonus part of the project is included, the only difference with the normal p
 
 ## Screenshots
 
-![App Screenshot](Screen Shot 2023-10-26 at 8.27.50 PM.png)
+image src="Screen Shot 2023-10-26 at 8.27.50 PM.png" alt = "des"
 
 
 ## 🚀 About Me
