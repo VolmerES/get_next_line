@@ -59,12 +59,6 @@ You can also try some other tests that are located in ./tests folder.
 
 The bonus part of the project is included, the only difference with the normal program is that it allows reading different fds at the same time, stored with a single static variable.
 
-
-## Screenshots
-
-image src="Screen Shot 2023-10-26 at 8.27.50 PM.png" alt = "des"
-
-
 ## 🚀 About Me
 I'm 42Network student at 42Madrid(Spain)
 
