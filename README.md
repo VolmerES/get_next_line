@@ -1,71 +1,70 @@
-![Logo](https://www.42network.org/wp-content/themes/e42-network/img/42-network-logo.svg)
-# 📖 ABOUT GNL 📖
+# get_next_line
 
-The Get Next Line (GNL) program is a simple and efficient utility in C for reading text from files, streams, or other input sources line by line. It is designed to provide a convenient way to process and manipulate data from various input sources while handling dynamic memory allocation efficiently.
+A C function that returns a file descriptor's contents one line at a time. You call it again and
+again until it returns `NULL`. It works on files, standard input and anything else you can `read()`
+from. Part of the 42 Madrid common core.
 
+What makes it interesting is the **static variable**: `read()` hands back chunks of `BUFFER_SIZE` bytes
+that rarely end on a newline, so whatever is left after the line has to survive until the next call,
+without leaking memory.
 
-## 📝 Instructions 📝
-**Compile & use**
+**Grade: 125/100** (with bonus)
 
-Compile the program by placing a main with the name of the file you need to read and its path in case it is not in the program folder itself.
-It could be done by args easily from the console by setting fd to '0'.
-
-Simple example:
+## Usage
 
 ```c
-int main() 
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "get_next_line.h"
+
+int main(void)
 {
-    int fd;
+    int   fd = open("tests/lore.txt", O_RDONLY);
     char *line;
 
-    fd = open("example.txt", O_RDONLY);
-    while ((line = get_next_line(fd)) != NULL) {
-        printf("%s\n", line);
+    while ((line = get_next_line(fd)) != NULL)
+    {
+        printf("%s", line);   // the line keeps its '\n'
         free(line);
     }
     close(fd);
-
-    return 0;
+    return (0);
 }
 ```
-## 🔎 What's inside? 🔎
 
-| Functions             | Other                                                              |
-| ----------------- | ------------------------------------------------------------------ |
-| get_next_line.c | get_next_line.h|
-| get_next_line_utlis.c | get_next_line_bonus.h|
-| get_next_line_bonus.c | tests|
-| get_next_line_utils_bonus.c|
-
-
-## ⚒️ Testing ⚒️
-
-[![Francinette Tester 🔗](Francinette)](https://github.com/xicodomingues/francinette)
-
-**To standart test, go to the library path and run:**
-
-All standard tests should work perfectly. 
 ```bash
-$ paco
+cc -D BUFFER_SIZE=42 main.c get_next_line.c get_next_line_utils.c
 ```
-**To strict test, go to the library path and run:**
 
-The "strict" tests do work correctly, except for two specific tests that can give a timeout, you can increase the time and go for a coffee, like this:
+`BUFFER_SIZE` defaults to 10 and can be set at compile time, from 1 up to very large values. Pass
+`0` as the descriptor to read from standard input.
+
+## Bonus
+
+`get_next_line_bonus.c` can read from **several file descriptors at once**, alternating between
+them, without losing its place in any. It keeps one leftover buffer per descriptor in a single static
+array.
+
 ```bash
-$ paco -s -tm 1000000
+cc -D BUFFER_SIZE=42 main.c get_next_line_bonus.c get_next_line_utils_bonus.c
 ```
-You can also try some other tests that are located in ./tests folder.
-## 🗒️ NOTES 🗒️
 
-The bonus part of the project is included, the only difference with the normal program is that it allows reading different fds at the same time, stored with a single static variable.
+## Files
 
-## 🚀 About Me
-I'm 42Network student at 42Madrid(Spain)
+| File | Contents |
+|---|---|
+| `get_next_line.c` / `.h` | The function |
+| `get_next_line_utils.c` | String helpers |
+| `*_bonus.c` / `*_bonus.h` | The version with multiple descriptors |
+| `tests/` | Edge-case inputs: empty file, one character, only newlines, a giant line… |
 
-You I track my progress through the common core at: 
+## Testing
 
-[![Intra 42 🔗]()](https://projects.intra.42.fr/projects/graph?login=jdelorme)
+[Francinette](https://github.com/xicodomingues/francinette): `paco` passes every standard test. In
+strict mode two tests can time out. Give them more time with `paco -s -tm 1000000`.
 
-More about:
+---
 
-[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/juan-bautista-delorme-pinedo-000697264/)
+Made by **Juan Bautista Delorme** (`jdelorme`) at 42 Madrid ·
+[Portfolio](https://juandelorme-portfolio.volmer.es) · [42 intra](https://profile.intra.42.fr/users/jdelorme)
