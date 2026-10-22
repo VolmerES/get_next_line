@@ -67,4 +67,4 @@ strict mode two tests can time out. Give them more time with `paco -s -tm 100000
 ---
 
 Made by **Juan Bautista Delorme** (`jdelorme`) at 42 Madrid ·
-[Portfolio](https://juandelorme-portfolio.volmer.es) · [42 intra](https://profile.intra.42.fr/users/jdelorme)
+[Portfolio](https://juandelorme-portfolio.volmer.es) · [LinkedIn](https://www.linkedin.com/in/jdelorme/) · [42 intra](https://profile.intra.42.fr/users/jdelorme)
